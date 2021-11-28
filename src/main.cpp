@@ -22,7 +22,7 @@ using bsoncxx::builder::basic::make_document;
 
 int main()
 {
-    int n, status;       //Creamos la variable que almacena el número de hijos y la que almacena el estado de salida del hijo
+    int n, status;//Creamos la variable que almacena el número de hijos y la que almacena el estado de salida del hijo
     pid_t pid, childpid; //Estas variables almacenan el id de los procesos hijos.
     //Pid almacena el valor devuelto al padre tras el fork y chilpid el valor devuelto al padre por la función wait cuando termina de esperar al hijo
     printf("Introduzca el número de procesos hijo que desea generar: ");
