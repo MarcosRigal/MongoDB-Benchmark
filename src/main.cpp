@@ -20,9 +20,17 @@ using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;
 using bsoncxx::builder::basic::make_document;
 
+bsoncxx::document::value jsonGenerator(int pid, int i)
+{
+    bsoncxx::document::value json = make_document(
+        kvp("PID", pid),
+        kvp("Iteration", i));
+    return json;
+}
+
 int main()
 {
-    int n, status;//Creamos la variable que almacena el número de hijos y la que almacena el estado de salida del hijo
+    int n, status;       //Creamos la variable que almacena el número de hijos y la que almacena el estado de salida del hijo
     pid_t pid, childpid; //Estas variables almacenan el id de los procesos hijos.
     //Pid almacena el valor devuelto al padre tras el fork y chilpid el valor devuelto al padre por la función wait cuando termina de esperar al hijo
     printf("Introduzca el número de procesos hijo que desea generar: ");
@@ -33,25 +41,6 @@ int main()
     mongocxx::instance inst{};
     mongocxx::client conn{mongocxx::uri{}};
     auto db = conn["test"];
-    bsoncxx::document::value restaurant_doc = make_document(
-        kvp("address",
-            make_document(kvp("street", "2 Avenue"),
-                          kvp("zipcode", 10075),
-                          kvp("building", "1480"),
-                          kvp("coord", make_array(-73.9557413, 40.7720266)))),
-        kvp("borough", "Manhattan"),
-        kvp("cuisine", "Italian"),
-        kvp("grades",
-            make_array(
-                make_document(kvp("date", bsoncxx::types::b_date{std::chrono::milliseconds{12323}}),
-                              kvp("grade", "A"),
-                              kvp("score", 11)),
-                make_document(
-                    kvp("date", bsoncxx::types::b_date{std::chrono::milliseconds{121212}}),
-                    kvp("grade", "B"),
-                    kvp("score", 17)))),
-        kvp("name", "Vella"),
-        kvp("restaurant_id", "41704620"));
 
     for (int i = 0; i < n; i++) //Cuando hacemos el fork la variable i es distinta en cada caso
     {                           //Se crean bucles diferentes e independientes
@@ -60,7 +49,10 @@ int main()
         {
         case 0:                                                                             //El fork se ha realizado corractamente
             printf("Soy %d el hijo nº %d del proceso: %d\n", getpid(), (i + 1), getppid()); //El hijo se identifica
-            db["restaurants"].insert_one(std::move(restaurant_doc));
+            for (int i = 0; i < 5; i++)
+            {
+                db["process"].insert_one(std::move(jsonGenerator(getpid(), i)));
+            }
             exit(EXIT_SUCCESS); //El hijo muere
 
         case -1:                                        //Ha ocurrido un error al realizar el fork
