@@ -167,6 +167,12 @@ void generateReport(std::vector<threadInfo> threadsInfo)
     }
 
     fclose(file);
+
+    file = fopen("reportPath.txt", "w");
+    snprintf(input, 512, "%s\n",fileName.c_str());
+    fputs(input, file);
+
+    fclose(file);
 }
 
 int main(int argc, char const *argv[])
