@@ -8,7 +8,6 @@ sudo apt-get update
 sudo apt-get install -y mongodb-org
 sudo systemctl daemon-reload
 sudo systemctl start mongod
-sudo systemctl status mongod
 wget https://downloads.mongodb.com/compass/mongodb-compass_1.29.5_amd64.deb
 sudo dpkg -i mongodb-compass_1.29.5_amd64.deb
 sudo apt purge --auto-remove cmake
@@ -39,3 +38,5 @@ sudo cmake --build . --target EP_mnmlstc_core
 cmake --build .
 cmake --build .
 sudo cmake --build . --target install
+sudo apt install python3-pip
+pip3 install matplotlib
