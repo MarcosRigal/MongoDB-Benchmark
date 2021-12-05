@@ -1,6 +1,9 @@
+#include <ctime>
 #include <time.h>
 #include <limits>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -19,16 +22,17 @@ using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;
 using bsoncxx::builder::basic::make_document;
 
-bsoncxx::document::value jsonGenerator(int pid, int i)
+bsoncxx::document::value jsonGenerator(pthread_t threadID, int iteration, std::string insertDate)
 {
     bsoncxx::document::value json = make_document(
-        kvp("PID", pid),
-        kvp("Iteration", i));
+        kvp("ThreadID", (long)threadID),
+        kvp("Iteration", iteration),
+        kvp("Inserted", insertDate));
     return json;
 }
 
 void clear()
-{ //Funcion que limpia la terminal en función del sistema operativo que estemos utilizando
+{
 #ifdef _WIN32
     system("cls");
 #else
@@ -36,92 +40,106 @@ void clear()
 #endif
 }
 
-//mongocxx::instance inst{};
-//mongocxx::client conn{mongocxx::uri{}};
-//auto db = conn["test"];
-//db["process"].insert_one(std::move(jsonGenerator(getpid(), i)));
+std::string getTime()
+{
+    auto time = std::time(nullptr);
+    auto localTime = *std::localtime(&time);
 
-void th_rand() //Esta será la función que ejecuten las hebras.
+    std::ostringstream oss;
+    oss << std::put_time(&localTime, "%H-%M-%S-%d-%m-%Y");
+    return oss.str();
+}
+
+void threadFunction()
 {
     clock_t begin = clock();
-    for (int i = 0; i < 100000; i++)
+    mongocxx::client conn{mongocxx::uri{}};
+    auto db = conn["test"];
+
+    for (int i = 0; i < 1000; i++)
     {
-        int j = 0;
-        j++;
+        db["process"].insert_one(std::move(jsonGenerator(pthread_self(), i, getTime())));
     }
-    double *time_spent = (double *)malloc(sizeof(double)); //reservamos memoria para un puntero de tipo float
+
+    double *time_spent = (double *)malloc(sizeof(double));
+
     clock_t end = clock();
+
     *time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
     pthread_exit((void *)time_spent);
 }
 
-int welcomeScreen()
+int welcomeScreen(int choice)
 {
-    int choice = 0;
     clear();
-    std::cout << "Welcome to version 1.0 of MarcosRigal's MongoDB Benchmark" << std::endl;
-    std::cout << "---------------------------------------------------------" << std::endl;
-    while ((choice < 1) || (choice > 5))
+    if ((choice < 1) || (choice > 5))
     {
-        std::cout << "Choose the Benchmark intensity: " << std::endl;
-        std::cout << "  - Choose 1 for low intensity." << std::endl;
-        std::cout << "  - Choose 2 for medium intensity." << std::endl;
-        std::cout << "  - Choose 3 for high intensity." << std::endl;
-        std::cout << "  - Choose 4 for extreme intensity." << std::endl;
-        std::cout << "  - Choose 5 for custom intensity." << std::endl;
-        std::cout << " Your choice: ";
-        while (!(std::cin >> choice))
+        std::cout << "Welcome to version 1.0 of MarcosRigal's MongoDB Benchmark" << std::endl;
+        std::cout << "---------------------------------------------------------" << std::endl;
+        while ((choice < 1) || (choice > 5))
         {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input.  Try again: ";
-        }
-        clear();
-        if ((choice < 1) || (choice > 5))
-        {
-            std::cout << "Error, choice invalid" << std::endl;
-        }
-    }
-    return choice;
-}
-
-int setIntensity(int choice)
-{
-    int numberOfThreads = 0;
-    if (choice == 1)
-    {
-        numberOfThreads = 100;
-    }
-    else if (choice == 2)
-    {
-        numberOfThreads = 1000;
-    }
-    else if (choice == 3)
-    {
-        numberOfThreads = 10000;
-    }
-    else if (choice == 4)
-    {
-        numberOfThreads = 100000;
-    }
-    else if (choice == 5)
-    {
-        clear();
-        while (numberOfThreads < 1)
-        {
-            std::cout << "Here you can choice the number of threads that will connect to your database." << std::endl;
-            std::cout << "Number Of Threads = ";
-            while (!(std::cin >> numberOfThreads))
+            std::cout << "Choose the Benchmark intensity: " << std::endl;
+            std::cout << "  - Choose 1 for low intensity." << std::endl;
+            std::cout << "  - Choose 2 for medium intensity." << std::endl;
+            std::cout << "  - Choose 3 for high intensity." << std::endl;
+            std::cout << "  - Choose 4 for extreme intensity." << std::endl;
+            std::cout << "  - Choose 5 for custom intensity." << std::endl;
+            std::cout << " Your choice: ";
+            while (!(std::cin >> choice))
             {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "Invalid input.  Try again: ";
             }
             clear();
-            if (numberOfThreads < 1)
+            if ((choice < 1) || (choice > 5))
             {
-                std::cout << "Error, the number of threads, shouldbe at least 1" << std::endl;
+                std::cout << "Error, choice invalid" << std::endl;
+            }
+        }
+    }
+    return choice;
+}
+
+int setIntensity(int choice, int numberOfThreads)
+{
+    if ((choice != 5) || (numberOfThreads == 0))
+    {
+        if (choice == 1)
+        {
+            numberOfThreads = 100;
+        }
+        else if (choice == 2)
+        {
+            numberOfThreads = 1000;
+        }
+        else if (choice == 3)
+        {
+            numberOfThreads = 10000;
+        }
+        else if (choice == 4)
+        {
+            numberOfThreads = 100000;
+        }
+        else if (choice == 5)
+        {
+            clear();
+            while (numberOfThreads < 1)
+            {
+                std::cout << "Here you can choice the number of threads that will connect to your database." << std::endl;
+                std::cout << "Number Of Threads = ";
+                while (!(std::cin >> numberOfThreads))
+                {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Invalid input.  Try again: ";
+                }
+                clear();
+                if (numberOfThreads < 1)
+                {
+                    std::cout << "Error, the number of threads, shouldbe at least 1" << std::endl;
+                }
             }
         }
     }
@@ -136,27 +154,43 @@ struct threadInfo
 
 void generateReport(std::vector<threadInfo> threadsInfo)
 {
+
+    FILE *file;
+    std::string fileName = "../reports/report-" + getTime() + ".txt";
+    std::cout << "Report generated at: " << fileName << std::endl;
+    file = fopen(fileName.c_str(), "w");
+    char input[512];
     for (int i = 0; i < (int)threadsInfo.size(); i++)
     {
-        std::cout << "Thread: " << threadsInfo[i].threadId << " Time spent: " << threadsInfo[i].time_spent << std::endl;
+        snprintf(input, 512, "%ld,%f\n", threadsInfo[i].threadId, threadsInfo[i].time_spent);
+        fputs(input, file);
     }
-    //FILE *f;
-    //GameManager *gameManager = GameManager::getInstance();
-    //f = fopen("users.txt", "w");
-    //char input[512];
-    //for (int i = 0; i < (int)gameManager->getUsers().size(); i++)
-    //{
-    //   snprintf(input, 512, "%s,%s\n", gameManager->getUsers()[i].getUserName(), gameManager->getUsers()[i].getUserPassword());
-    //   fputs(input, f);
-    //}
-    //
-    //fclose(f);
+
+    fclose(file);
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
-    int choice = welcomeScreen();
-    int numberOfThreads = setIntensity(choice);
+    clear();
+
+    int choice = 0;
+    int numberOfThreads = 0;
+
+    if (argc == 2)
+    {
+        choice = atoi(argv[1]);
+    }
+
+    else if (argc == 3)
+    {
+        choice = atoi(argv[1]);
+        numberOfThreads = atoi(argv[2]);
+    }
+
+    choice = welcomeScreen(choice);
+    numberOfThreads = setIntensity(choice, numberOfThreads);
+
+    mongocxx::instance inst{};
 
     pthread_t threadsId[numberOfThreads];
     std::vector<threadInfo> threadsInfo;
@@ -165,7 +199,7 @@ int main()
 
     for (int i = 0; i < numberOfThreads; i++)
     {
-        if (pthread_create(&(threadsId[i]), NULL, (void *(*)(void *))th_rand, NULL))
+        if (pthread_create(&(threadsId[i]), NULL, (void *(*)(void *))threadFunction, NULL))
         {
             fprintf(stderr, "Error creating thread\n");
             exit(EXIT_FAILURE);
@@ -179,11 +213,12 @@ int main()
             fprintf(stderr, "Error joining thread\n");
             exit(EXIT_FAILURE);
         }
-        
+
         threadInfo threadInfo = {threadsId[i], *time_spent};
         threadsInfo.push_back(threadInfo);
     }
 
+    std::cout << "Benchmark successfully completed!!" << std::endl;
     generateReport(threadsInfo);
 
     exit(EXIT_SUCCESS);
