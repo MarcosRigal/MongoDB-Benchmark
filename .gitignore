@@ -34,3 +34,4 @@
 # Configurations
 .vscode
 reports
+bin/reportPath.txt
