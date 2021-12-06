@@ -32,5 +32,6 @@
 *.app
 
 # Configurations
+.vscode
 reports
 bin/reportPath.txt
