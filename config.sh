@@ -1,7 +1,10 @@
 #!/bin/bash
 #This script install mongodb, mongo compass & mongo conector for C++
 #Author: MarcosRigal 28-11-2021
+sudo apt-get install g++
+sudo apt install curl
 sudo apt-get install gnupg
+sudo apt --fix-broken install 
 wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 sudo apt-get update
@@ -31,12 +34,14 @@ cd
 curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.6/mongo-cxx-driver-r3.6.6.tar.gz
 tar -xzf mongo-cxx-driver-r3.6.6.tar.gz
 cd mongo-cxx-driver-r3.6.6/build
-cmake ..                                    -DCMAKE_BUILD_TYPE=Release              -DCMAKE_INSTALL_PREFIX=/usr/local
-cmake ..                                    -DCMAKE_BUILD_TYPE=Release              -DCMAKE_INSTALL_PREFIX=/opt/mongo       -DCMAKE_INSTALL_RPATH=/opt/mongo
-cmake ..                                                -DCMAKE_BUILD_TYPE=Release                          -DCMAKE_PREFIX_PATH=/opt/mongo-c-driver             -DCMAKE_INSTALL_PREFIX=/opt/mongo-cxx-driver
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/mongo -DCMAKE_INSTALL_RPATH=/opt/mongo
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/opt/mongo-c-driver -DCMAKE_INSTALL_PREFIX=/opt/mongo-cxx-driver
 sudo cmake --build . --target EP_mnmlstc_core
 cmake --build .
 cmake --build .
 sudo cmake --build . --target install
 sudo apt install python3-pip
-pip3 install matplotlib
+pip3 install matplotlibx
+sudo mv /opt/mongo-cxx-driver/include/mongocxx/ /usr/local/include/
+sudo mv /opt/mongo-cxx-driver/include/bsoncxx/ /usr/local/include/
