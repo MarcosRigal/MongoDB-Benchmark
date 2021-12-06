@@ -9,11 +9,14 @@ wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add 
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
+sudo apt --fix-broken install 
 sudo systemctl daemon-reload
 sudo systemctl start mongod
 wget https://downloads.mongodb.com/compass/mongodb-compass_1.29.5_amd64.deb
 sudo dpkg -i mongodb-compass_1.29.5_amd64.deb
+sudo apt --fix-broken install 
 sudo apt purge --auto-remove cmake
+sudo apt --fix-broken install 
 sudo apt update && sudo apt install -y software-properties-common lsb-release && sudo apt clean all
 wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
 sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
@@ -42,6 +45,6 @@ cmake --build .
 cmake --build .
 sudo cmake --build . --target install
 sudo apt install python3-pip
-pip3 install matplotlibx
+pip3 install matplotlib
 sudo mv /opt/mongo-cxx-driver/include/mongocxx/ /usr/local/include/
 sudo mv /opt/mongo-cxx-driver/include/bsoncxx/ /usr/local/include/
