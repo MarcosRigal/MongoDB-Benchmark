@@ -14,5 +14,9 @@ report = readFile()
 threadsId = sorted(report)
 time_spents = [report[threadId] for threadId in threadsId ]
 
+plt.plot(range(len(report)), time_spents)
+plt.show()
+
+
 plt.bar(range(len(report)), time_spents, tick_label=range(len(report)))
 plt.show()
