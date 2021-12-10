@@ -17,3 +17,7 @@ Go into the folder:
 After that you must run the config script to install all the dependencies necessary for the benchmark to run to do that paste this on the same terminal:
 
     ./config.sh
+
+This script will also run the benchmark. If you want to run it after that use: 
+    
+    ./benchmark.sh
