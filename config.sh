@@ -49,3 +49,4 @@ sudo cmake --build . --target install
 cmake .. -DBSONCXX_OUTPUT_BASENAME=custom_bsoncxx -DMONGOCXX_OUTPUT_BASENAME=custom_mongocxx
 sudo apt install python3-pip
 pip3 install matplotlib
+sudo ./benchmark.sh
