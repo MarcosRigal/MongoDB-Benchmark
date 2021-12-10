@@ -1,6 +1,9 @@
 #!/bin/bash
 #This script install mongodb, mongo compass & mongo conector for C++
 #Author: MarcosRigal 28-11-2021
+sudo apt update
+sudo apt upgrade
+sudo add-apt-repository universe
 sudo apt-get install g++ -y
 sudo apt install curl -y
 sudo apt-get install gnupg -y
