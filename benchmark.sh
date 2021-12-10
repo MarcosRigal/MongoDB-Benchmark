@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo systemctl start mongod
 rm -Rf mongo*
 mkdir reports/
 make clean

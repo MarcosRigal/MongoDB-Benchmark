@@ -112,15 +112,15 @@ int setIntensity(int choice, int numberOfThreads)
         }
         else if (choice == 2)
         {
-            numberOfThreads = 1000;
+            numberOfThreads = 250;
         }
         else if (choice == 3)
         {
-            numberOfThreads = 10000;
+            numberOfThreads = 500;
         }
         else if (choice == 4)
         {
-            numberOfThreads = 100000;
+            numberOfThreads = 1000;
         }
         else if (choice == 5)
         {
@@ -169,7 +169,7 @@ void generateReport(std::vector<threadInfo> threadsInfo)
     fclose(file);
 
     file = fopen("reportPath.txt", "w");
-    snprintf(input, 512, "%s\n",fileName.c_str());
+    snprintf(input, 512, "%s\n", fileName.c_str());
     fputs(input, file);
 
     fclose(file);

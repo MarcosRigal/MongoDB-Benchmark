@@ -4,6 +4,7 @@
 sudo apt update
 sudo apt upgrade
 sudo add-apt-repository universe
+sudo apt-get install git
 sudo apt-get install g++ -y
 sudo apt install curl -y
 sudo apt-get install gnupg -y
@@ -48,5 +49,3 @@ sudo cmake --build . --target install
 cmake .. -DBSONCXX_OUTPUT_BASENAME=custom_bsoncxx -DMONGOCXX_OUTPUT_BASENAME=custom_mongocxx
 sudo apt install python3-pip
 pip3 install matplotlib
-sudo mv /opt/mongo-cxx-driver/include/mongocxx/ /usr/local/include/
-sudo mv /opt/mongo-cxx-driver/include/bsoncxx/ /usr/local/include/
